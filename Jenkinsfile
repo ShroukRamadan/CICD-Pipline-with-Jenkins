@@ -6,12 +6,12 @@ pipeline {
             steps {
 
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                git :'https://github.com/ShroukRamadan/CICD-Pipline-with-Jenkins.git', 
+                git 'https://github.com/ShroukRamadan/CICD-Pipline-with-Jenkins.git'
                 sh """
                 docker login -u ${USERNAME} -p ${PASSWORD}
-                cd /var/jenkins_home/workspace/CICD-Pipline-with-Jenkins/Backend-App
-                docker build . -f dockerfile -t shrouk20180287/node-img:v1.0
-                docker push shrouk20180287/node-img:v1.0
+                cd /var/jenkins_home/workspace/Deploy-nodejs-app-on-eks/Backend-App
+                docker build . -f dockerfile --network host -t shrouk20180287/node-img:v2.1
+                docker push shrouk20180287/node-img:v2.1
                 """
                 
                 }
@@ -21,8 +21,8 @@ pipeline {
          stage('CD') {
             steps {
                 sh """
-                    cd /var/jenkins_home/workspace/CICD-Pipline-with-Jenkins/App-K8s
-                    kubectl apply -f .
+                    cd /var/jenkins_home/workspace/Deploy-nodejs-app-on-eks/App-K8s
+                    kubectl apply -f ns.yml
                     kubectl apply -f .
                     kubectl get all -n app-ns
                 """
